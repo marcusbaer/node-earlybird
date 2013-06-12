@@ -1,0 +1,32 @@
+﻿{
+	"name": "earlybird",
+	"version": "0.1.1",
+	"description": "A quick and easy to setup web server for earlybird development and even more.",
+	"homepage": "http://github.com/marcusbaer/earlybird",
+    "keywords": ["server", "quick", "easy", "lightweight", "https", "ssl", "websockets", "socket"],
+	"author": "Marcus Baer <info@baer-media.com>",
+	"repository": {
+		"type": "git",
+		"url": "http://github.com/marcusbaer/earlybird.git"
+	},
+	"bugs": {
+		"url": "https://github.com/marcusbaer/earlybird/issues"
+	},
+	"licenses" : [
+        {
+            "type": "MIT",
+            "url": "http://github.com/marcusbaer/earlybird/blob/master/LICENSE"
+        }
+    ],
+	"engines" : {
+		"node": ">=0.10",
+		"npm": ">=1.2.14"
+	},
+	"dependencies": {
+		"optimist": "~0.3.5"
+	},
+	"bin": {
+		"earlybird": "./bin/earlybird"
+	},
+	"main": "./earlybird.js"
+}

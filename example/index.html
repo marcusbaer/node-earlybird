@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<meta charset="utf-8">
+<header>
+    <title>Earlybird Demo</title>
+</header>
+<body>
+	<h1>Hello</h1>
+	<p>This is a demo page. Open your console to see more output!</p>
+</body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="socket.io.js"></script>
+<script src="jquery.service.js"></script>
+<script language="javascript">
+
+//var socket = io.connect( document.location.origin );
+//socket.on('connect', function () {
+//    socket.emit('hello', {id: '123'});
+//    socket.on('hello', function (response) {
+//        console.log("response from hello socket:");
+//        console.log(response);
+//    });
+//});
+
+$(document).ready(function() {
+
+    $(document).callService('demo', {}, function(response){
+        console.log("response from hello service:");
+		console.log(response);
+    });
+
+    $(document).initSocket(function(){
+        $(document).callSocket('hello', {id: '123'}, function (response) {
+            console.log("response from hello socket:");
+            console.log(response);
+        });
+    });
+
+});
+
+
+</script>

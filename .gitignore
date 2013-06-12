@@ -2,13 +2,17 @@ lib-cov
 *.seed
 *.log
 *.csv
+*.tsv
 *.dat
 *.out
 *.pid
 *.gz
+*.db
 
 pids
 logs
 results
+node_modules
+ssl
 
 npm-debug.log
