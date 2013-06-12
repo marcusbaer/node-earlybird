@@ -84,6 +84,9 @@ var static = function (req, res) {
         case "jpg":
             contentType = 'image/jpeg';
             break;
+        case "gif":
+            contentType = 'image/gif';
+            break;
 		case "xml":
 			contentType = 'text/xml';
 			break;
@@ -93,6 +96,10 @@ var static = function (req, res) {
 		case "swf":
 			contentType = 'application/x-shockwave-flash';
 			break;
+        case "svg":
+            readAsText = true;
+            contentType = 'image/svg+xml';
+            break;
 		default:
 			isAllowedExt = false;
 			break;
