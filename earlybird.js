@@ -48,8 +48,8 @@ if (argv.ssl || argv.nohttp) {
     var httpProxy = require('http-proxy');
     var options = {
         https: {
-            key: fs.readFileSync('./ssl/localhost.key', 'utf8'),
-            cert: fs.readFileSync('./ssl/localhost.cert', 'utf8')
+            key: fs.readFileSync(wwwDir + '/ssl/localhost.key', 'utf8'),
+            cert: fs.readFileSync(wwwDir + '/ssl/localhost.cert', 'utf8')
         }
     };
     // a standalone HTTPS proxy server
