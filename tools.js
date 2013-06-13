@@ -2,6 +2,7 @@
 var fs = require('fs');
 var sys = require('util');
 var serviceScript = null;
+var socketsScript = null;
 //var childProcess = require('child_process');
 
 var port = argv.p || '80';
@@ -10,6 +11,10 @@ var wwwDir = argv.www || process.cwd();
 
 if (argv.s) {
 	serviceScript = require(wwwDir + '/' + argv.s).service;
+}
+
+if (argv.ws) {
+	socketsScript = require(wwwDir + '/' + argv.ws).sockets;
 }
 	
 var callService = function (serviceName, postData, callback) {
@@ -29,6 +34,16 @@ var service = function (req, res, postData) {
         res.write(JSON.stringify(responseData));
         res.end();
     });
+};
+
+var sockets = function (socket) {
+//	socket.on('hello', function (params) {
+//		socket.emit('hello', params);
+//		socket.broadcast.emit('hello', params);
+//	});
+	if (socketsScript) {
+		socketsScript(socket);
+	}
 };
 
 var static = function (req, res) {
@@ -132,6 +147,7 @@ var static = function (req, res) {
 
 exports.static = static;
 exports.service = service;
+exports.sockets = sockets;
 
 function encode (txt) {
     return new Buffer(txt).toString('base64');

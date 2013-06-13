@@ -1,6 +1,10 @@
 ﻿(function($){
 
-    esock = io.connect( document.location.origin );
+	var secureFlag = false;
+	if (document.location.origin.indexOf('https') === 0) {
+		secureFlag = true;
+	}
+    esock = io.connect( document.location.origin, {secure: secureFlag} );
 
     $.fn.callService = function (serviceName, serviceData, successCallback, options) {
         var callService = function (serviceName, serviceData, successCallback) {

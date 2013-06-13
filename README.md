@@ -23,7 +23,7 @@ Starting parameters overview
 	s		set a service method script
 	u		a service url prefix different from 'service' (http://localhost/service/demo)
 
-	ws		use WebSockets
+	ws		use WebSockets by setting a sockets method script
 
 	ssl		start with ssl support (on port 443)
 	h		a host name different from localhost (for ssl)
@@ -64,9 +64,9 @@ Or do something else.
 WebSockets
 ------------------
 
-To use WebSockets, install `socket.io` first (`npm install socket.io -g`). After that start earlybird server with `--ws` flag.
+To use WebSockets, install `socket.io` first (`npm install socket.io -g`). After that start earlybird server with `--ws` attribute.
 
-	earlybird --ws
+	earlybird --ws=sockets
 
 Calling services from frontend is shown in example as well.
 
@@ -77,6 +77,8 @@ Calling services from frontend is shown in example as well.
         	});
     	});
 	});
+
+At the moment there are problems running WebSockets with SSL.
 
 SSL support
 ------------------

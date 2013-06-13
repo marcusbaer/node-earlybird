@@ -7,10 +7,6 @@ var port = argv.p || 80;
 var host = argv.h || 'localhost';
 var wwwDir = argv.www || process.cwd();
 
-if (argv.s) {
-    serviceScript = require(wwwDir + '/' + argv.s).service;
-}
-
 if (!argv.nohttp) {
 	var httpServer = http.createServer(function(req, res) {
 		var body = "";
@@ -33,10 +29,7 @@ if (argv.ws) {
     var io = require('socket.io').listen(httpServer);
     io.set('log level', 1); // disables debugging
     io.sockets.on('connection', function (socket) {
-        socket.on('hello', function (params) {
-            socket.emit('hello', params);
-            socket.broadcast.emit('hello', params);
-        });
+		tools.sockets(socket);
     });
 	sys.log('Starting WebSockets..');
 }
