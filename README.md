@@ -27,6 +27,7 @@ Starting parameters overview
 
 	ssl		start with ssl support (on port 443)
 	h		a host name different from localhost (for ssl)
+	nohttp	do not run standard http server and start only https proxy listening on port `-p` (default is 80)
 
 Usage of a service
 ------------------

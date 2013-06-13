@@ -11,9 +11,7 @@ var wwwDir = argv.www || process.cwd();
 if (argv.s) {
 	serviceScript = require(wwwDir + '/' + argv.s).service;
 }
-
-sys.log('Running EARLYBIRD server on port ' + port + ' with ' + wwwDir + ' as working directory');
-
+	
 var callService = function (serviceName, postData, callback) {
     var responseData = {};
 	if (serviceScript) {
