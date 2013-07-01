@@ -1,2 +1,2 @@
-#!/usr/bin node
+#!/usr/bin/node
 require( __dirname + '/../earlybird' );
