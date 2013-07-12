@@ -30,7 +30,8 @@ Starting parameters overview
 	nohttp	do not run standard http server and start only https proxy listening on port `-p` (default is 80)
 
 	a       set a basic auth user account given by `username:password`
-	am      set a basic auth message
+	amsg    set a basic auth message
+	aall    use basic auth for all files
 
 Usage of a service
 ------------------
@@ -95,6 +96,6 @@ Basic authentication
 
 Content file types as images, audio or video files as well as JSON data can be protected by an simple basic authentication. It is also used for javascript files. Other file types like HTML or CSS/LESS can pass unauthorized.
 
-To use earlybird server with basic auth, run with `--a` and a user/password combination seperated by a ":". A different auth message can be set by `--am`:
+To use earlybird server with basic auth, run with `--a` and a user/password combination seperated by a ":". A different auth message can be set by `--amsg`. To expand basic auth to all files, set flag `--aall`.
 
-    earlybird --a username:password --am "Please tell me who you are"
+    earlybird --a username:password --amsg "Please tell me who you are" -aall

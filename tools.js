@@ -9,7 +9,8 @@ var port = argv.p || '80';
 var serviceUrl = argv.u || 'service';
 var wwwDir = argv.www || process.cwd();
 var basicAuthUser = (argv.a) ? encode(argv.a) : null;
-var basicAuthMsg = (argv.am) || "Secure Area";
+var basicAuthMsg = (argv.amsg) || "Secure Area";
+var basicAuthAll = (argv.aall) ? true : false;
 
 if (argv.s) {
 	serviceScript = require(wwwDir + '/' + argv.s).service;
@@ -136,7 +137,7 @@ function fileInfo(ext) {
 	var fileInfo = {
 		mime: 'text/plain',
 		binaryData: false,
-		private: false,
+		private: (basicAuthAll) ? true : false,
 		secureFlag: false,
 		allow: true
 	};
