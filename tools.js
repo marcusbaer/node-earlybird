@@ -16,24 +16,24 @@ if (argv.s) {
 if (argv.ws) {
 	socketsScript = require(wwwDir + '/' + argv.ws).sockets;
 }
-	
+
 var callService = function (serviceName, postData, callback) {
-    var responseData = {};
+	var responseData = {};
 	if (serviceScript) {
 		responseData = serviceScript(serviceName, postData);
 	}
-    if (callback) {
-        callback(responseData);
-    }
+	if (callback) {
+		callback(responseData);
+	}
 };
 
 var service = function (req, res, postData) {
-	var url = new RegExp('\/'+serviceUrl+'\/');
-    callService(req.url.replace(url,''), JSON.parse(postData), function(responseData){
-        res.writeHead(200, { 'content-type': 'application/json' });
-        res.write(JSON.stringify(responseData));
-        res.end();
-    });
+	var url = new RegExp('\/' + serviceUrl + '\/');
+	callService(req.url.replace(url, ''), JSON.parse(postData), function (responseData) {
+		res.writeHead(200, { 'content-type':'application/json' });
+		res.write(JSON.stringify(responseData));
+		res.end();
+	});
 };
 
 var sockets = function (socket) {
@@ -48,100 +48,41 @@ var sockets = function (socket) {
 
 var static = function (req, res) {
 
-    var filename;
-    filename = (req.url === "/") ? wwwDir + "/index.html" : wwwDir + req.url;
+	var filename;
+	filename = (req.url === "/") ? wwwDir + "/index.html" : wwwDir + req.url;
 
-    var u = filename.split('.');
-    var ext = u.pop();
+	var u = filename.split('.');
+	var fileInfo = fileInfo(u.pop());
 
-    var contentType = 'text/plain';
-	var isAllowedExt = true;
-	var readAsText = false;
-
-    switch (ext) {
-        case "txt":
-            contentType = 'text/plain';
-            break;
-        case "html":
-        case "htm":
-            contentType = 'text/html';
-            break;
-        case "css":
-        case "less":
-            contentType = 'text/css';
-            break;
-        case "js":
-            contentType = 'text/javascript';
-            break;
-		case "json":
-			readAsText = true;
-			contentType = 'application/json';
-			break;
-        case "tsv":
-        case "csv":
-            contentType = 'text/comma-separated-values';
-            break;
-        case "ico":
-            contentType = 'image/x-ico';
-            break;
-        case "png":
-            contentType = 'image/png';
-            break;
-        case "jpg":
-            contentType = 'image/jpeg';
-            break;
-        case "gif":
-            contentType = 'image/gif';
-            break;
-		case "xml":
-			contentType = 'text/xml';
-			break;
-		case "pdf":
-			contentType = 'application/pdf';
-			break;
-		case "swf":
-			contentType = 'application/x-shockwave-flash';
-			break;
-        case "svg":
-            readAsText = true;
-            contentType = 'image/svg+xml';
-            break;
-		default:
-			isAllowedExt = false;
-			break;
-    }
-
-	if ( readAsText === false && (contentType.indexOf('image') >= 0 || contentType.indexOf('application') >= 0) ) {
+	if (fileInfo.binaryData === true) {
 		fs.readFile(filename, function (err, data) {
 			if (err) {
 				//throw err;
 				res.writeHead(404);
 				res.end();
 			} else {
-				res.writeHead(200, { 'content-type': contentType });
+				res.writeHead(200, { 'content-type': fileInfo.mime });
 				res.write(data);
 				res.end();
 			}
 		});
-    } else {
-		if (isAllowedExt) {
+	} else if (fileInfo.allow) {
 			fs.readFile(filename, 'utf8', function (err, data) {
 				if (err) {
 					//throw err;
 					res.writeHead(404);
 					res.end();
 				} else {
-					res.writeHead(200, { 'content-type': contentType });
-					res.write(data+"\n");
+					res.writeHead(200, { 'content-type': fileInfo.mime });
+					res.write(data + "\n");
 					res.end();
 				}
 			});
-		} else {
-			res.writeHead(200, { 'content-type': 'text/plain' });
-			res.write("Not supported file type\n");
-			res.end();
-		}
-    }
+	} else {
+		res.writeHead(200, { 'content-type': fileInfo.mime });
+		res.write("Not supported file type\n");
+		res.end();
+	}
 
 };
 
@@ -149,12 +90,102 @@ exports.static = static;
 exports.service = service;
 exports.sockets = sockets;
 
-function encode (txt) {
-    return new Buffer(txt).toString('base64');
+function encode(txt) {
+	return new Buffer(txt).toString('base64');
 }
 
-function decode (txt) {
-    return new Buffer(txt, 'base64').toString('utf8');
+function decode(txt) {
+	return new Buffer(txt, 'base64').toString('utf8');
+}
+
+function fileInfo(ext) {
+
+	var fileInfo = {
+		mime: 'text/plain',
+		binaryData: false,
+		secureFlag: false,
+		allow: true
+	};
+
+	switch (ext) {
+		case "txt":
+			break;
+		case "html":
+		case "htm":
+			fileInfo.mime = 'text/html';
+			break;
+		case "css":
+		case "less":
+			fileInfo.mime = 'text/css';
+			break;
+		case "js":
+			fileInfo.mime = 'text/javascript';
+			fileInfo.secureFlag = true;
+			break;
+		case "json":
+			fileInfo.mime = 'application/json';
+			fileInfo.secureFlag = true;
+			break;
+		case "tsv":
+		case "csv":
+			fileInfo.mime = 'text/comma-separated-values';
+			fileInfo.secureFlag = true;
+			break;
+		case "ico":
+			fileInfo.mime = 'image/x-ico';
+			fileInfo.binaryData = true;
+			break;
+		case "png":
+			fileInfo.mime = 'image/png';
+			fileInfo.binaryData = true;
+			break;
+		case "jpg":
+			fileInfo.mime = 'image/jpeg';
+			fileInfo.binaryData = true;
+			break;
+		case "gif":
+			fileInfo.mime = 'image/gif';
+			fileInfo.binaryData = true;
+			break;
+		case "xml":
+			fileInfo.mime = 'text/xml';
+			fileInfo.secureFlag = true;
+			break;
+		case "pdf":
+			fileInfo.mime = 'application/pdf';
+			fileInfo.binaryData = true;
+			break;
+		case "swf":
+			fileInfo.mime = 'application/x-shockwave-flash';
+			fileInfo.binaryData = true;
+			break;
+		case "svg":
+			fileInfo.mime = 'image/svg+xml';
+			break;
+		case "mp3":
+			fileInfo.mime = 'audio/mpeg';
+			fileInfo.binaryData = true;
+			break;
+		case "mpg":
+		case "mpeg":
+			fileInfo.mime = 'video/mpeg';
+			fileInfo.binaryData = true;
+			break;
+		case "mov":
+			fileInfo.mime = 'video/quicktime';
+			fileInfo.binaryData = true;
+			break;
+		case "avi":
+			fileInfo.mime = 'video/x-msvideo';
+			fileInfo.binaryData = true;
+			break;
+		default:
+			fileInfo.allow = false;
+			break;
+	}
+
+	return fileInfo;
+
 }
 
 //function loadTemplate (filename, callback) {
