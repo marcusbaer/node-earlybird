@@ -29,6 +29,9 @@ Starting parameters overview
 	h		a host name different from localhost (for ssl)
 	nohttp	do not run standard http server and start only https proxy listening on port `-p` (default is 80)
 
+	a       set a basic auth user account given by `username:password`
+	am      set a basic auth message
+
 Usage of a service
 ------------------
 
@@ -86,3 +89,12 @@ SSL support
 To run earlybird server with ssl, install `http-proxy` first (`npm install http-proxy -g`) and start with `--ssl` parameter. Optionally set another host name with `--h`. SSL needs a (self-signed) ssl certificate. It has to be placed inside a folder named `ssl` in your working directory. Place here both files `localhost.key` and `localhost.cert`. Actually SSL is only supported on port 443.
 
 	earlybird --ssl --h "abc.de"
+
+Basic authentication
+------------------
+
+Content file types as images, audio or video files as well as JSON data can be protected by an simple basic authentication. It is also used for javascript files. Other file types like HTML or CSS/LESS can pass unauthorized.
+
+To use earlybird server with basic auth, run with `--a` and a user/password combination seperated by a ":". A different auth message can be set by `--am`:
+
+    earlybird --a username:password --am "Please tell me who you are"

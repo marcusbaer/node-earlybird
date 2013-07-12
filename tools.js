@@ -8,6 +8,8 @@ var socketsScript = null;
 var port = argv.p || '80';
 var serviceUrl = argv.u || 'service';
 var wwwDir = argv.www || process.cwd();
+var basicAuthUser = (argv.a) ? encode(argv.a) : null;
+var basicAuthMsg = (argv.am) || "Secure Area";
 
 if (argv.s) {
 	serviceScript = require(wwwDir + '/' + argv.s).service;
@@ -52,36 +54,67 @@ var static = function (req, res) {
 	filename = (req.url === "/") ? wwwDir + "/index.html" : wwwDir + req.url;
 
 	var u = filename.split('.');
-	var fileInfo = fileInfo(u.pop());
+	var fileinfo = fileInfo(u.pop());
+	var userAuthorized = true;
 
-	if (fileInfo.binaryData === true) {
-		fs.readFile(filename, function (err, data) {
-			if (err) {
-				//throw err;
-				res.writeHead(404);
-				res.end();
+	if (basicAuthUser && fileinfo.private) {
+		userAuthorized = false;
+		var auth = req.headers['authorization'];  // is in base64(username:password)
+		if (auth) { // The Authorization was passed in so now we validate it
+
+			var tmp = auth.split(' '); // Split on a space, the original auth looks like  "Basic Y2hhcmxlczoxMjM0NQ==" and we need the 2nd part
+			if (basicAuthUser === tmp[1]) {
+				userAuthorized = true;
 			} else {
-				res.writeHead(200, { 'content-type': fileInfo.mime });
-				res.write(data);
-				res.end();
+				res.statusCode = 401; // Force them to retry authentication
+//				res.statusCode = 403;   // or alternatively just reject them altogether with a 403 Forbidden
+				res.setHeader('WWW-Authenticate', 'Basic realm="'+ basicAuthMsg + '"');
+				res.end('Not allowed');
 			}
-		});
-	} else if (fileInfo.allow) {
+
+		} else { // No Authorization header was passed in so it's the first time the browser hit us
+
+			// Sending a 401 will require authentication, we need to send the 'WWW-Authenticate' to tell them the sort of authentication to use
+			// Basic auth is quite literally the easiest and least secure, it simply gives back  base64( username + ":" + password ) from the browser
+			res.statusCode = 401;
+			res.setHeader('WWW-Authenticate', 'Basic realm="'+ basicAuthMsg + '"');
+			res.end('Not allowed');
+
+		}
+	}
+
+	if (userAuthorized) {
+
+		if (fileinfo.binaryData === true) {
+			fs.readFile(filename, function (err, data) {
+				if (err) {
+					//throw err;
+					res.writeHead(404);
+					res.end();
+				} else {
+					res.writeHead(200, { 'content-type': fileinfo.mime });
+					res.write(data);
+					res.end();
+				}
+			});
+		} else if (fileinfo.allow) {
 			fs.readFile(filename, 'utf8', function (err, data) {
 				if (err) {
 					//throw err;
 					res.writeHead(404);
 					res.end();
 				} else {
-					res.writeHead(200, { 'content-type': fileInfo.mime });
+					res.writeHead(200, { 'content-type': fileinfo.mime });
 					res.write(data + "\n");
 					res.end();
 				}
 			});
-	} else {
-		res.writeHead(200, { 'content-type': fileInfo.mime });
-		res.write("Not supported file type\n");
-		res.end();
+		} else {
+			res.writeHead(200, { 'content-type': fileinfo.mime });
+			res.write("Not supported file type\n");
+			res.end();
+		}
+
 	}
 
 };
@@ -103,6 +136,7 @@ function fileInfo(ext) {
 	var fileInfo = {
 		mime: 'text/plain',
 		binaryData: false,
+		private: false,
 		secureFlag: false,
 		allow: true
 	};
@@ -121,15 +155,18 @@ function fileInfo(ext) {
 		case "js":
 			fileInfo.mime = 'text/javascript';
 			fileInfo.secureFlag = true;
+			fileInfo.private = true;
 			break;
 		case "json":
 			fileInfo.mime = 'application/json';
 			fileInfo.secureFlag = true;
+			fileInfo.private = true;
 			break;
 		case "tsv":
 		case "csv":
 			fileInfo.mime = 'text/comma-separated-values';
 			fileInfo.secureFlag = true;
+			fileInfo.private = true;
 			break;
 		case "ico":
 			fileInfo.mime = 'image/x-ico';
@@ -138,22 +175,31 @@ function fileInfo(ext) {
 		case "png":
 			fileInfo.mime = 'image/png';
 			fileInfo.binaryData = true;
+			fileInfo.secureFlag = true;
+			fileInfo.private = true;
 			break;
 		case "jpg":
 			fileInfo.mime = 'image/jpeg';
 			fileInfo.binaryData = true;
+			fileInfo.secureFlag = true;
+			fileInfo.private = true;
 			break;
 		case "gif":
 			fileInfo.mime = 'image/gif';
 			fileInfo.binaryData = true;
+			fileInfo.secureFlag = true;
+			fileInfo.private = true;
 			break;
 		case "xml":
 			fileInfo.mime = 'text/xml';
 			fileInfo.secureFlag = true;
+			fileInfo.private = true;
 			break;
 		case "pdf":
 			fileInfo.mime = 'application/pdf';
 			fileInfo.binaryData = true;
+			fileInfo.secureFlag = true;
+			fileInfo.private = true;
 			break;
 		case "swf":
 			fileInfo.mime = 'application/x-shockwave-flash';
@@ -165,19 +211,27 @@ function fileInfo(ext) {
 		case "mp3":
 			fileInfo.mime = 'audio/mpeg';
 			fileInfo.binaryData = true;
+			fileInfo.secureFlag = true;
+			fileInfo.private = true;
 			break;
 		case "mpg":
 		case "mpeg":
 			fileInfo.mime = 'video/mpeg';
 			fileInfo.binaryData = true;
+			fileInfo.secureFlag = true;
+			fileInfo.private = true;
 			break;
 		case "mov":
 			fileInfo.mime = 'video/quicktime';
 			fileInfo.binaryData = true;
+			fileInfo.secureFlag = true;
+			fileInfo.private = true;
 			break;
 		case "avi":
 			fileInfo.mime = 'video/x-msvideo';
 			fileInfo.binaryData = true;
+			fileInfo.secureFlag = true;
+			fileInfo.private = true;
 			break;
 		default:
 			fileInfo.allow = false;
