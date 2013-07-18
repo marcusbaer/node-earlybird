@@ -206,6 +206,11 @@ function fileInfo(ext) {
 			fileInfo.mime = 'application/x-shockwave-flash';
 			fileInfo.binaryData = true;
 			break;
+		case "apk":
+			fileInfo.mime = 'application/vnd.android.package-archive';
+			fileInfo.binaryData = true;
+			fileInfo.secureFlag = true;
+			fileInfo.private = true;
 		case "svg":
 			fileInfo.mime = 'image/svg+xml';
 			break;
