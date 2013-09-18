@@ -99,3 +99,11 @@ Content file types as images, audio or video files as well as JSON data can be p
 To use earlybird server with basic auth, run with `--a` and a user/password combination seperated by a ":". A different auth message can be set by `--amsg`. To expand basic auth to all files, set flag `--aall`.
 
     earlybird --a username:password --amsg "Please tell me who you are" -aall
+
+Future tasks
+-------------------
+
+1. fix question mark bug with requests
+2. Basic auth for services
+3. configuration file
+4. earlybird create task for a default setup
