@@ -107,3 +107,5 @@ Future tasks
 2. Basic auth for services
 3. configuration file
 4. earlybird create task for a default setup
+5. Support more than one basic auth user
+
