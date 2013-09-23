@@ -57,15 +57,83 @@ var static = function (req, res) {
 	var u = filename.split('.');
 	var fileinfo = fileInfo(u.pop());
 	var userAuthorized = true;
+	ext = ext.split('?');
+	ext = ext[0];
 
 	if (basicAuthUser && fileinfo.private) {
 		userAuthorized = false;
 		var auth = req.headers['authorization'];  // is in base64(username:password)
 		if (auth) { // The Authorization was passed in so now we validate it
 
+
 			var tmp = auth.split(' '); // Split on a space, the original auth looks like  "Basic Y2hhcmxlczoxMjM0NQ==" and we need the 2nd part
 			if (basicAuthUser === tmp[1]) {
-				userAuthorized = true;
+
+
+    switch (ext) {
+        case "txt":
+            contentType = 'text/plain';
+            break;
+        case "html":
+        case "htm":
+            contentType = 'text/html';
+            break;
+        case "css":
+        case "less":
+            contentType = 'text/css';
+            break;
+        case "js":
+            contentType = 'text/javascript';
+            break;
+		case "json":
+			readAsText = true;
+			contentType = 'application/json';
+			break;
+        case "tsv":
+        case "csv":
+            contentType = 'text/comma-separated-values';
+            break;
+        case "ico":
+            contentType = 'image/x-ico';
+            break;
+        case "png":
+            contentType = 'image/png';
+            break;
+        case "jpg":
+            contentType = 'image/jpeg';
+            break;
+        case "gif":
+            contentType = 'image/gif';
+            break;
+		case "xml":
+			contentType = 'text/xml';
+			break;
+		case "pdf":
+			contentType = 'application/pdf';
+			break;
+		case "swf":
+			contentType = 'application/x-shockwave-flash';
+			break;
+		case "eot":
+		case "ttf":
+		case "woff":
+			contentType = 'application/octet-stream';
+			break;
+        case "svg":
+            readAsText = true;
+            contentType = 'image/svg+xml';
+            break;
+		default:
+			isAllowedExt = false;
+			break;
+    }
+
+	if ( readAsText === false && (contentType.indexOf('image') >= 0 || contentType.indexOf('application') >= 0) ) {
+		fs.readFile(filename, function (err, data) {
+			if (err) {
+				//throw err;
+				res.writeHead(404);
+				res.end();
 			} else {
 				res.statusCode = 401; // Force them to retry authentication
 //				res.statusCode = 403;   // or alternatively just reject them altogether with a 403 Forbidden
